@@ -1,10 +1,9 @@
 import Foundation
-import SwiftData
 
-@Model
-final class DataItem {
-    var timestamp: Date
-
+struct DataItem: Identifiable {
+    let id = UUID()
+    let timestamp: Date
+    
     init(timestamp: Date) {
         self.timestamp = timestamp
     }

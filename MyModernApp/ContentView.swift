@@ -1,19 +1,23 @@
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query(sort: \DataItem.timestamp, order: .reverse) private var items: [DataItem]
-
+    @State private var items: [DataItem] = []
+    
     var body: some View {
         NavigationView {
             List {
                 ForEach(items) { item in
-                    Text("Item added at: \(item.timestamp, format: .dateTime)")
+                    VStack(alignment: .leading) {
+                        Text("Item #\(item.id)")
+                            .font(.headline)
+                        Text("Added at: \(item.timestamp, format: .dateTime)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 .onDelete(perform: deleteItems)
             }
-            .navigationTitle("Local Data Store")
+            .navigationTitle("Hello World")
             .toolbar {
                 ToolbarItem {
                     Button(action: addItem) {
@@ -22,25 +26,27 @@ struct ContentView: View {
                 }
             }
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = DataItem(timestamp: Date())
-            modelContext.insert(newItem)
+        .onAppear {
+            loadSampleData()
         }
     }
-
+    
+    private func addItem() {
+        let newItem = DataItem(timestamp: Date())
+        items.append(newItem)
+    }
+    
     private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+        items.remove(atOffsets: offsets)
+    }
+    
+    private func loadSampleData() {
+        if items.isEmpty {
+            items.append(DataItem(timestamp: Date()))
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: DataItem.self, inMemory: true)
 }
